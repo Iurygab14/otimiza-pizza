@@ -1,30 +1,39 @@
-from flask import Flask, render_template
+from flask import Flask, render_template, request
 import pulp
 
 app = Flask(__name__)
 
-@app.route("/")
+@app.route("/", methods=["GET", "POST"])
 def home():
 
-    prob = pulp.LpProblem("Pizza", pulp.LpMaximize)
+    resultado = None
 
-    x = pulp.LpVariable("Mucarela", lowBound=0, cat="Integer")
-    y = pulp.LpVariable("Calabresa", lowBound=0, cat="Integer")
+    if request.method == "POST":
 
-    prob += 20*x + 25*y
+        massa = float(request.form["massa"])
+        queijo = float(request.form["queijo"])
+        molho = float(request.form["molho"])
+        calabresa_estoque = float(request.form["calabresa"])
 
-    prob += 0.5*x + 0.5*y <= 10
-    prob += 0.3*x + 0.2*y <= 5
-    prob += 0.2*x + 0.2*y <= 4
-    prob += 0.15*y <= 2
+        prob = pulp.LpProblem("Pizza", pulp.LpMaximize)
 
-    prob.solve(pulp.PULP_CBC_CMD(msg=0))
+        x = pulp.LpVariable("Mucarela", lowBound=0, cat="Integer")
+        y = pulp.LpVariable("Calabresa", lowBound=0, cat="Integer")
 
-    resultado = {
-        "mucarela": int(x.varValue),
-        "calabresa": int(y.varValue),
-        "lucro": int(pulp.value(prob.objective))
-    }
+        prob += 20*x + 25*y
+
+        prob += 0.5*x + 0.5*y <= massa
+        prob += 0.3*x + 0.2*y <= queijo
+        prob += 0.2*x + 0.2*y <= molho
+        prob += 0.15*y <= calabresa_estoque
+
+        prob.solve(pulp.PULP_CBC_CMD(msg=0))
+
+        resultado = {
+            "mucarela": int(x.varValue),
+            "calabresa": int(y.varValue),
+            "lucro": int(pulp.value(prob.objective))
+        }
 
     return render_template("index.html", resultado=resultado)
 
