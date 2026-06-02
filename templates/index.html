@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Otimização de Pizza</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+
+<div class="container">
+
+    <h1>Otimização de Lucro de Pizzaria</h1>
+
+    <div class="resultado">
+        <p>Muçarela: {{ resultado.mucarela }} pizzas</p>
+
+        <p>Calabresa: {{ resultado.calabresa }} pizzas</p>
+
+        <p class="lucro">
+            Lucro Máximo: R$ {{ resultado.lucro }}
+        </p>
+    </div>
+
+</div>
+
+</body>
+</html>
